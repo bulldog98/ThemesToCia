@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 
 if [[ -z "$(which makerom)" ]]; then
-  echo "Make sure makerom is in" '$PATH'
+  echo "Make sure makerom is in your" '$PATH'
   exit 0
 fi
 if [[ -z "$(which convert)" ]]; then
-  echo "imagemagic is a dependecy install it!!!"
+  echo "imagemagick is a dependency, install it and make sure it is in your PATH!!!"
   exit 0
 fi
 if [[ -z "$(which ffmpeg)" ]]; then
-  echo "ffmpeg is a dependecy install it!!!"
+  echo "ffmpeg is a dependency, install it and makre sure it is in your PATH!!!"
   exit 0
 fi
 if [[ $# -ne 1 ]]; then
