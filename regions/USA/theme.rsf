@@ -1,0 +1,22 @@
+BasicInfo:
+  Title                   : "none"
+  CompanyCode             : "00"
+  ProductCode             : "CTR-M-HMME-00"
+  ContentType             : Application # Application / SystemUpdate / Manual / Child / Trial
+  Logo                    : None # Nintendo / Licensed / Distributed / iQue / iQueForSystem
+ 
+RomFs:
+  # Specifies the root path of the file system to include in the ROM.
+  RootPath                : "**replaceme**data/01**"
+ 
+ 
+TitleInfo:
+  UniqueId                : 0x00008F
+  Category                : AddOnContents # Application / SystemApplication / Applet / Firmware / Base / DlpChild / Demo / Contents / SystemContents / SharedContents / AddOnContents / Patch / AutoUpdateContents
+ 
+Option:
+  UseOnSD                 : true # true if App is to be installed to SD
+  EnableCompress          : true # Compresses exefs code
+  FreeProductCode         : true # Removes limitations on ProductCode
+  EnableCrypt             : false # Enables encryption for NCCH and CIA
+  MediaFootPadding        : false # If true CCI files are created with padding
