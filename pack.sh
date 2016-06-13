@@ -5,6 +5,16 @@ if [[ -z "$(which makerom)" ]]; then
   exit 0
 fi
 
+if [[ -z "$(which convert)" ]]; then
+  echo "imagemagic is a dependecy install it!!!"
+  exit 0
+fi
+
+if [[ -z "$(which ffmpeg)" ]]; then
+  echo "ffmpeg is a dependecy install it!!!"
+  exit 0
+fi
+
 costummakerom="makerom -target t"
 
 themes="`ls Themes`"
