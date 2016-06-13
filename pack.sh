@@ -27,37 +27,40 @@ case $1 in
         region="USA"
         ;;
     "-J")
-	region="JAP"
-	;;
+	      region="JAP"
+	      ;;
     *)
         echo "This is not supported"
         exit 0
+        ;;
 esac
 
 costummakerom="makerom -target t"
 
 themes="`ls Themes`"
-themesshortend=("${themes[@]}")
 numthemes=${#themes[@]}
 
 #FIXME: a bin works as follows input is $themesshortend[${i}]
-# dd conv=notrunc of=tools\${region}\rom\ContentInfoArchive_${region}_${lang}.bin bs=1 seek=$((8+${i}*200))
+# dd conv=notrunc of=tools\${region}\rom\ContentInfoArchive_${region}_${lang}.bin bs=1 seek=$((8+(${i}+1)*200))
 
 for (( i=0; i<${numthemes}; i++ ));
 do
-  themesshortend[i] = $(echo $themes[i]|cut -c1-64)
+  themesshortend[$i]=$(echo ${themes[$i]}|cut -c1-64)
 done
 
 for (( i=0; i<${numthemes}; i++ ));
 do
   #FIXME: first check if such an icon.* exists
-  if test -n "$(find Themes/$themes[i] -maxdepth 1 -name 'icon.*' -print -quit)"; then
-    convert Themes/$themes[i]/icon.* -resize 48x48 -background black -gravity center -extent 48x48 icons/$i.png
-    ffmpeg -hide_banner -loglevel panic -vcodec png -i icons/$i.png -vcodec rawvideo -f rawvideo -pix_fmt rgb565 icons/$i.icn
+  next=$(($i + 1))
+  if test -n "$(find Themes/${themes[$i]} -maxdepth 1 -name 'icon.*' -print -quit)"; then
+    convert Themes/${themes[$i]}/icon.* -resize 48x48 -background black -gravity center -extent 48x48 icons/${next}.png
+    ffmpeg -hide_banner -loglevel panic -vcodec png -i icons/${next}.png -vcodec rawvideo -f rawvideo -pix_fmt rgb565 icons/${next}.icn
   else
     #FIXME: handle default icon
+    touch icons/$next.icn
     echo "Do stuff with default icon"
   fi
+  cp icons/$next.icn Themes/${themes[$i]}/
 done
 # FIXME: generate icns & cfa per Theme
 
