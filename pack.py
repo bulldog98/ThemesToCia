@@ -51,6 +51,10 @@ def strToFixedUtf8(string, length):
             enc = enc[:-1]
     return enc + ((length - len(enc)) * b'\x00')
 
+def isThemeComplete(theme: ThemeEntry):
+    files = next(os.walk(theme.foldername))[2]
+    return 'body_LZ.bin' in files and 'info.smdh' in files
+
 def listThemes():
     thisDir = os.path.dirname(__file__)
     themeDir = os.path.join(thisDir, 'themes')
