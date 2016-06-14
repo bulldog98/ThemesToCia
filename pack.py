@@ -85,11 +85,11 @@ def isThemeComplete(folder):
 
 def processThemes():
     thisDir = os.path.dirname(__file__)
-    themeDir = os.path.join(thisDir, 'themes')
+    themeDir = os.path.join(thisDir, 'Themes')
     folders = next(os.walk(themeDir))[1]
     i = 0
     for folder in folders:
-        if not isThemeComplete():
+        if not isThemeComplete(os.path.join(themeDir, folder)):
             continue
         yield processTheme(folder, i)
         i += 1
@@ -108,11 +108,13 @@ def processTheme(folder, uid):
     tryCopy(os.path.join(folder, 'info.smdh'), themeDir)
     tryCopy(os.path.join(folder, 'bgm.bcstm'), themeDir)
     getIcon(folder, themeDir)
-
     return ThemeEntry(folder, uid)
 
 
 def doConversion(region, reverse):
+    themes = processThemes()
+    # Remember that the 3DS wants the theme list reversed, so it is in
+    # alphabetical order
     raise Exception('not implemented yet')
 
 
