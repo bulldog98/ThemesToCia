@@ -41,6 +41,16 @@ def convertIcon(theme):
         # TODO parse info.smdh or use default
         raise Error('Not implemented yet')
 
+def strToFixedUtf8(string, length):
+    enc = string.encode('utf-8')[:length]
+    while True:
+        try:
+            enc.decode('utf-8')
+            break
+        except:
+            enc = enc[:-1]
+    return enc + ((length - len(enc)) * b'\x00')
+
 def listThemes():
     thisDir = os.path.dirname(__file__)
     themeDir = os.path.join(thisDir, 'themes')
