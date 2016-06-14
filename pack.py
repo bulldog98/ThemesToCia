@@ -2,11 +2,11 @@
 
 import argparse
 import os
-from collections import namedtuple
 import subprocess
-from tempfile import TemporaryDirectory
-from shutil import copyfile
+from collections import namedtuple
 from distutils.spawn import find_executable
+from shutil import copyfile
+from tempfile import TemporaryDirectory
 
 ThemeEntry = namedtuple('ThemeEntry', ['foldername', 'uid'])
 
@@ -14,19 +14,30 @@ tmpDir = TemporaryDirectory()
 normalizedThemes = os.path.join(tmpDir, 'themes')
 os.makedirs(normalizedThemes)
 
+
 def assertToolsExist():
-    assert find_executable('makerom'), 'Install makerom and ensure it is in $PATH'
-    assert find_executable('convert'), 'Install imagemagick and ensure it is in $PATH'
-    assert find_executable('ffmpeg'), 'Install ffmpeg and make sure is is in $PATH'
+    assert find_executable('makerom'),
+    'Install makerom and ensure it is in $PATH'
+    assert find_executable('convert'),
+    'Install imagemagick and ensure it is in $PATH'
+    assert find_executable('ffmpeg'),
+    'Install ffmpeg and make sure is is in $PATH'
+
 
 def parseCmd():
     parser = argparse.ArgumentParser()
-    regionGroup = parser.add_mutually_exclusive_group(required = True)
-    regionGroup.add_argument('-e', action='append_const', dest='region', const='e')
-    regionGroup.add_argument('-u', action='append_const', dest='region', const='u')
-    regionGroup.add_argument('-j', action='append_const', dest='region', const='j')
-    parser.add_argument('-r', '--reverse' action='store_false', help='Sort the themes so they show up in reverse alphabetical order in the 3DS')
+    regionGroup = parser.add_mutually_exclusive_group(required=True)
+    regionGroup.add_argument('-e', action='append_const', dest='region',
+                             const='e')
+    regionGroup.add_argument('-u', action='append_const', dest='region',
+                             const='u')
+    regionGroup.add_argument('-j', action='append_const', dest='region',
+                             const='j')
+    parser.add_argument('-r', '--reverse', action='store_false',
+                        help='Sort the themes so they show up in reverse ' +
+                        'alphabetical order in the 3DS')
     return parser.parse_args()
+
 
 def getIcon(source, dest):
     themeIcon = os.path.join(source, 'icon')
@@ -34,9 +45,17 @@ def getIcon(source, dest):
     infoSmdh = os.path.join(source, 'info.smdh')
     if os.path.exists(themeIcon + '.icn'):
         copyfile(themeIcon + '.icn', tmpIcon + '.icn')
-    else if [x for x in next(os.walk(theme.foldername))[2] if x.startswith('icon.')]:
-        subprocess.call(['convert', themeIcon + '.*', '-resize', '48x48', '-background', 'black', '-gravity' 'center', '-extent', '48x48', tmpIcon + '.png'], shell=True)
-        subprocess.call(['ffmpeg', '-hide_banner', '-loglevel', 'panic', '-vcodec', 'png', '-i', tmpIcon + '.png', '-vcodec', 'rawvideo', '-pix_fmt', 'rgb56565', tmpIcon + '.icn'])
+    else if [x for x in next(os.walk(theme.foldername))[2]
+             if x.startswith('icon.')]:
+        subprocess.call(
+            ['convert', themeIcon + '.*', '-resize', '48x48',
+             '-background', 'black', '-gravity' 'center', '-extent', '48x48',
+             tmpIcon + '.png'],
+            shell=True)
+        subprocess.call(
+            ['ffmpeg', '-hide_banner', '-loglevel', 'panic', '-vcodec', 'png',
+             '-i', tmpIcon + '.png', '-vcodec', 'rawvideo', '-pix_fmt',
+             'rgb56565', tmpIcon + '.icn'])
         os.remove(tmpIcon + '.png')
     else if os.path.exists(infoSmdh):
         with open(infoSmdh, 'rb') as f:
@@ -45,8 +64,9 @@ def getIcon(source, dest):
             with open(tmpIcon + '.icn', 'w') as iconFile:
                 f.write(icon)
     else:
-        # TODO use default
+        # TODO(default) use default
         raise Error('Not implemented yet')
+
 
 def strToFixedUtf8(string, length):
     enc = string.encode('utf-8')[:length]
@@ -54,13 +74,15 @@ def strToFixedUtf8(string, length):
         try:
             enc.decode('utf-8')
             break
-        except:
+        except Exception:
             enc = enc[:-1]
     return enc + ((length - len(enc)) * b'\x00')
+
 
 def isThemeComplete(folder):
     files = next(os.walk(folder))[2]
     return 'body_LZ.bin' in files and 'info.smdh' in files
+
 
 def processThemes():
     thisDir = os.path.dirname(__file__)
@@ -73,22 +95,27 @@ def processThemes():
         yield processTheme(folder, i)
         i += 1
 
+
 def tryCopy(source, dest):
     if os.path.exists(source):
         copyfile(source, dest)
+
 
 def processTheme(folder, uid):
     themeDir = os.path.join(normalizedThemes, uid)
     os.makedirs(themeDir)
     tryCopy(os.path.join(folder, 'body_LZ.bin'), themeDir)
-    tryCopy(os.path.join(folder, 'info.smdh'), themeDir) # TODO figure out if we need this file
+    # TODO(fileneeded) figure out if we need this file
+    tryCopy(os.path.join(folder, 'info.smdh'), themeDir)
     tryCopy(os.path.join(folder, 'bgm.bcstm'), themeDir)
     getIcon(folder, themeDir)
 
     return ThemeEntry(folder, uid)
 
+
 def doConversion(region, reverse):
     raise Error('not implemented yet')
+
 
 if __name__ == '__main__':
     args = parse_args()
