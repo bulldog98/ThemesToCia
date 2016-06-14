@@ -27,7 +27,7 @@ case $1 in
         region="USA"
         ;;
     "-J")
-	      region="JAP"
+	      region="JPN"
 	      ;;
     *)
         echo "This is not supported"
