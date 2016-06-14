@@ -62,7 +62,7 @@ def getIcon(source, dest):
             f.seek(0x24C0)
             icon = f.read(0x1200)
             with open(tmpIcon + '.icn', 'w') as iconFile:
-                f.write(icon)
+                iconFile.write(icon)
     else:
         # TODO(default) use default
         raise Error('Not implemented yet')
@@ -118,5 +118,5 @@ def doConversion(region, reverse):
 
 
 if __name__ == '__main__':
-    args = parse_args()
+    args = parseCmd()
     doConversion(args.region[0], args.reverse)
