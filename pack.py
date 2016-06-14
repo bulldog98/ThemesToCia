@@ -16,12 +16,12 @@ os.makedirs(normalizedThemes)
 
 
 def assertToolsExist():
-    assert find_executable('makerom'),
-    'Install makerom and ensure it is in $PATH'
-    assert find_executable('convert'),
-    'Install imagemagick and ensure it is in $PATH'
-    assert find_executable('ffmpeg'),
-    'Install ffmpeg and make sure is is in $PATH'
+    assert find_executable('makerom'), \
+        'Install makerom and ensure it is in $PATH'
+    assert find_executable('convert'), \
+        'Install imagemagick and ensure it is in $PATH'
+    assert find_executable('ffmpeg'), \
+        'Install ffmpeg and make sure is is in $PATH'
 
 
 def parseCmd():
