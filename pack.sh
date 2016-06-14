@@ -1,5 +1,17 @@
 #!/usr/bin/env bash
 
+# reverse a array
+function reverse()
+{
+  local arrayname=${1:?Array name required} array revarray e
+  eval "array=( \"\${$arrayname[@]}\" )"
+  for e in "${array[@]}"
+  do
+    revarray=( "$e" "${revarray[@]}" )
+  done
+  eval "$arrayname=( \"\${revarray[@]}\" )"
+}
+
 if [[ -z "$(which makerom)" ]]; then
   echo "Make sure makerom is in your" '$PATH'
   exit 0
@@ -12,7 +24,7 @@ if [[ -z "$(which ffmpeg)" ]]; then
   echo "ffmpeg is a dependency, install it and makre sure it is in your PATH!!!"
   exit 0
 fi
-if [[ $# -ne 1 ]]; then
+if [[ $# -ne 1 ]] && [[ $# -ne 2 ]]; then
     echo "Illegal number of parameters"
 fi
 
@@ -35,9 +47,38 @@ case $1 in
         ;;
 esac
 
-costummakerom="makerom -target t"
+order="-r"
+if [[ $# -eq 2 ]];then
+  case $2 in
+    "-r")
+      order=""
+      ;;
+    *)
+      echo "Only sorting allowed is -r or non at all"
+      ;;
+    esac
+fi
 
-themes="`ls Themes`"
+themes=()
+cd Themes
+for FILE in *; do
+    # If the file is a directory add it to the array. ("&&" is shorthand for
+    # if/then.)
+    [[ -d $FILE ]] && themes+=("$FILE")
+done
+cd ..
+case $order in
+  "")
+    reverse themes
+    ;;
+  "-r")
+    #Nothing to do here
+    ;;
+  *)
+    echo "Invalid order"
+    ;;
+esac
+costummakerom="makerom -target t"
 numthemes=${#themes[@]}
 
 #FIXME: a bin works as follows input is $themesshortend[${i}]
@@ -52,15 +93,17 @@ for (( i=0; i<${numthemes}; i++ ));
 do
   #FIXME: first check if such an icon.* exists
   next=$(($i + 1))
-  if test -n "$(find Themes/${themes[$i]} -maxdepth 1 -name 'icon.*' -print -quit)"; then
-    convert Themes/${themes[$i]}/icon.* -resize 48x48 -background black -gravity center -extent 48x48 icons/${next}.png
+  tmptheme=${themes[$i]}
+  echo $tmptheme
+  if test -n "$(find Themes/${tmptheme}/ -maxdepth 1 -name 'icon.*' -print -quit)"; then
+    convert Themes/${tmptheme}/icon.* -resize 48x48 -background black -gravity center -extent 48x48 icons/${next}.png
     ffmpeg -hide_banner -loglevel panic -vcodec png -i icons/${next}.png -vcodec rawvideo -f rawvideo -pix_fmt rgb565 icons/${next}.icn
   else
     #FIXME: handle default icon
     touch icons/$next.icn
     echo "Do stuff with default icon"
   fi
-  cp icons/$next.icn Themes/${themes[$i]}/
+  cp icons/$next.icn Themes/${tmptheme}/
 done
 # FIXME: generate icns & cfa per Theme
 
