@@ -11,7 +11,7 @@ from tempfile import TemporaryDirectory
 ThemeEntry = namedtuple('ThemeEntry', ['foldername', 'uid'])
 
 tmpDir = TemporaryDirectory()
-normalizedThemes = os.path.join(tmpDir, 'themes')
+normalizedThemes = os.path.join(tmpDir.name, 'themes')
 os.makedirs(normalizedThemes)
 
 
@@ -45,8 +45,7 @@ def getIcon(source, dest):
     infoSmdh = os.path.join(source, 'info.smdh')
     if os.path.exists(themeIcon + '.icn'):
         copyfile(themeIcon + '.icn', tmpIcon + '.icn')
-    else if [x for x in next(os.walk(theme.foldername))[2]
-             if x.startswith('icon.')]:
+    elif [x for x in (next(os.walk(source))[2]) if x.startswith('icon.')]:
         subprocess.call(
             ['convert', themeIcon + '.*', '-resize', '48x48',
              '-background', 'black', '-gravity' 'center', '-extent', '48x48',
@@ -57,7 +56,7 @@ def getIcon(source, dest):
              '-i', tmpIcon + '.png', '-vcodec', 'rawvideo', '-pix_fmt',
              'rgb56565', tmpIcon + '.icn'])
         os.remove(tmpIcon + '.png')
-    else if os.path.exists(infoSmdh):
+    elif os.path.exists(infoSmdh):
         with open(infoSmdh, 'rb') as f:
             f.seek(0x24C0)
             icon = f.read(0x1200)
@@ -65,7 +64,7 @@ def getIcon(source, dest):
                 iconFile.write(icon)
     else:
         # TODO(default) use default
-        raise Error('Not implemented yet')
+        raise Exception('Not implemented yet')
 
 
 def strToFixedUtf8(string, length):
@@ -114,7 +113,7 @@ def processTheme(folder, uid):
 
 
 def doConversion(region, reverse):
-    raise Error('not implemented yet')
+    raise Exception('not implemented yet')
 
 
 if __name__ == '__main__':
