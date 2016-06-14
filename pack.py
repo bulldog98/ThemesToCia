@@ -6,6 +6,7 @@ from collections import namedtuple
 import subprocess
 from tempfile import TemporaryDirectory
 from shutil import copyfile
+from distutils.spawn import find_executable
 
 ThemeEntry = namedtuple('ThemeEntry', ['foldername', 'uid'])
 
@@ -13,6 +14,10 @@ tmpDir = TemporaryDirectory()
 iconDir = os.path.join(tmpDir.name, 'icons')
 os.makedirs(iconDir)
 
+def assertToolsExist():
+    assert find_executable('makerom'), 'Install makerom and ensure it is in $PATH'
+    assert find_executable('convert'), 'Install imagemagick and ensure it is in $PATH'
+    assert find_executable('ffmpeg'), 'Install ffmpeg and make sure is is in $PATH'
 
 def parseCmd():
     parser = argparse.ArgumentParser()
