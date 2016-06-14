@@ -18,7 +18,7 @@ os.makedirs(NORMALIZEDTHEMES)
 
 
 def assert_tools_exist():
-    """Asserts that all required tools are in the path"""
+    """Assert that all required tools are in the PATH."""
     assert find_executable('makerom'), \
         'Install makerom and ensure it is in $PATH'
     assert find_executable('convert'), \
@@ -28,7 +28,7 @@ def assert_tools_exist():
 
 
 def parse_cmd():
-    """Parse the command line arguments"""
+    """Parse the command line arguments."""
     parser = argparse.ArgumentParser()
     region_group = parser.add_mutually_exclusive_group(required=True)
     region_group.add_argument(
@@ -45,7 +45,20 @@ def parse_cmd():
 
 
 def get_icon(source, dest):
-    """get the icon out of source into dest"""
+    """
+    Extract the icon from a theme and save it to C{dest}.
+
+    If an icon file in RGB565 already exists, use that, if another file called
+    icon exists, resize it to 48x48 and convert it to RGB565. Else extract the
+    icon from info.smdh if it exists or use a default.
+
+    @param source: The directory containing the theme files.
+    @type  source: str
+    @param dest:   The directory containing normalized theme files.
+    @type  dest:   str
+
+    @rtype:        NoneType
+    """
     theme_icon = os.path.join(source, 'icon')
     tmp_icon = os.path.join(dest, 'icon')
     info_smdh = os.path.join(source, 'info.smdh')
@@ -74,7 +87,19 @@ def get_icon(source, dest):
 
 
 def str_to_fixed_utf8(string, length):
-    """convert stirng to utf-8 and get it to exact length"""
+    """
+    Convert a string to UTF-8, cut it to no more than C{length} bytes,
+    correctly handling multiple byte characters, and pad it with zeroes to
+    exactly C{length} bytes.
+
+    @param string: The string to be converted.
+    @type  string: str
+    @param length: The length to resize the string to.
+    @type  length: int
+
+    @return:       The byte string representing the input.
+    @rtype:        bytes
+    """
     enc = string.encode('utf-8')[:length]
     while True:
         try:
@@ -92,7 +117,13 @@ def is_theme_complete(folder):
 
 
 def process_themes():
-    """This function preprocesses all themes and returns a list of them"""
+    """
+    Preprocesses all themes in the themes folder and return their corresponding
+    C{ThemeEntry}s.
+
+    @return: A generator for the C{ThemeEntry} objects.
+    @rtype:  generator
+    """
     this_dir = os.path.dirname(__file__)
     theme_dir = os.path.join(this_dir, 'Themes')
     folders = next(os.walk(theme_dir))[1]
@@ -105,13 +136,33 @@ def process_themes():
 
 
 def try_copy(source, dest):
-    """if source exists it copies source to dest"""
+    """
+    If file C{source} exists, copy it to folder C{dest}.
+
+    @param source: The source file.
+    @type  source: str
+    @param dest:   The destination directory.
+    @type  dest:   str
+
+    @rtype:        NoneType
+    """
     if os.path.exists(source):
         copyfile(source, dest)
 
 
 def process_theme(folder, uid):
-    """This function preprocesses the theme and returns a ThemeEntry for it"""
+    """
+    Normalize the theme in C{folder} and return a C{ThemeEntry} for it. If the
+    theme is not complete, return C{None} instead.
+
+    @param folder: The folder in which the theme files are located.
+    @type  folder: str
+    @param uid:    An ID for the theme unique to the current process.
+    @type  uid:    int
+
+    @return:       A C{ThemeEntry} containing the data for the current theme.
+    @rtype:        ThemeEntry
+    """
     theme_dir = os.path.join(NORMALIZEDTHEMES, uid)
     os.makedirs(theme_dir)
     try_copy(os.path.join(folder, 'body_LZ.bin'), theme_dir)
